@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Rate Limiter — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/rate-limiter/archify/rate-limiter.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "client",
+      "label": "Client",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "gateway",
+      "label": "Gateway",
+      "type": "cloud",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "identity",
+      "label": "Identity + policy",
+      "type": "security",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "limiter",
+      "label": "Limiter algorithm",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "state",
+      "label": "Atomic quota state",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "service",
+      "label": "Backend service",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "client",
+      "to": "gateway",
+      "label": "request"
+    },
+    {
+      "id": "edge2",
+      "from": "gateway",
+      "to": "identity",
+      "label": "resolve key"
+    },
+    {
+      "id": "edge3",
+      "from": "identity",
+      "to": "limiter",
+      "label": "policy + cost"
+    },
+    {
+      "id": "edge4",
+      "from": "limiter",
+      "to": "state",
+      "label": "atomic consume"
+    },
+    {
+      "id": "edge5",
+      "from": "limiter",
+      "to": "service",
+      "label": "allow"
+    },
+    {
+      "id": "edge6",
+      "from": "limiter",
+      "to": "gateway",
+      "label": "429 / retry info"
+    }
+  ]
+}

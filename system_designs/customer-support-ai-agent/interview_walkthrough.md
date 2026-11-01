@@ -10,3 +10,8 @@
 8. Explain rollout from read-only to governed tools and canary.
 
 Follow-ups: tenant isolation proof? approval invalidation? ambiguous tool outcome? unsafe deflection? kill switch? golden set and PII handling?
+
+
+## Enhanced walkthrough
+
+Use the [system-specific 10-minute visual walkthrough](visual_explainer.md) alongside this checklist. It includes the architecture narration, critical request sequence, invariants, failure paths, trade-offs and follow-up questions. Practice drawing the diagram from memory before reading the notes.

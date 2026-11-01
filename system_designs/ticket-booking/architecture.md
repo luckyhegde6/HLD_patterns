@@ -35,3 +35,8 @@ stateDiagram-v2
  Held --> Available: TTL expires / payment fails
  Booked --> Cancelled: cancellation policy
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/ticket-booking.architecture.json](archify/ticket-booking.architecture.json).

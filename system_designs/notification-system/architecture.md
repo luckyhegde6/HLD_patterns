@@ -42,3 +42,8 @@ flowchart TD
  RETRY --> SEND
  OK -->|Permanent| FAIL[Mark failed / fallback if policy allows]
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/notification-system.architecture.json](archify/notification-system.architecture.json).

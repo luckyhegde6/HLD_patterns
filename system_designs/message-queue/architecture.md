@@ -32,3 +32,8 @@ flowchart TD
  WAIT --> PROC
  RETRY -->|No| DLQ[Dead-letter + alert]
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/message-queue.architecture.json](archify/message-queue.architecture.json).

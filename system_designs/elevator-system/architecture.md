@@ -40,3 +40,8 @@ stateDiagram-v2
  Moving --> EmergencyStop: safety event
  DoorOpen --> EmergencyMode: emergency command
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/elevator-system.architecture.json](archify/elevator-system.architecture.json).

@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Elevator Control System — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/elevator-system/archify/elevator-system.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "rider",
+      "label": "Riders / panels",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "dispatcher",
+      "label": "Dispatcher",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "optimizer",
+      "label": "Dispatch optimizer",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "controller",
+      "label": "Car controller",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "safety",
+      "label": "Safety controller",
+      "type": "security",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "state",
+      "label": "Building state",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "rider",
+      "to": "dispatcher",
+      "label": "hall call"
+    },
+    {
+      "id": "edge2",
+      "from": "dispatcher",
+      "to": "optimizer",
+      "label": "eligible cars"
+    },
+    {
+      "id": "edge3",
+      "from": "optimizer",
+      "to": "controller",
+      "label": "assign stop"
+    },
+    {
+      "id": "edge4",
+      "from": "controller",
+      "to": "safety",
+      "label": "motion permit"
+    },
+    {
+      "id": "edge5",
+      "from": "dispatcher",
+      "to": "state",
+      "label": "persist state"
+    }
+  ]
+}

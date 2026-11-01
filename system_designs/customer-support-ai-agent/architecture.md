@@ -105,3 +105,7 @@ flowchart TD
 - Retrieved text and attachments are untrusted prompt-injection input.
 - Tool runtime validates permissions, schema, scope, risk, quotas and idempotency on every call.
 - Audit records capture actor, action, approval, policy version and outcome without unnecessary sensitive prompt data.
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/customer-support-ai-agent.architecture.json](archify/customer-support-ai-agent.architecture.json).

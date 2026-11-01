@@ -89,3 +89,7 @@ flowchart TB
 | Retry / timeout / duplicate rate | Amplification and idempotency defects |
 | CPU, memory and connection saturation | Capacity exhaustion |
 | Business success/failure | Actual system outcomes |
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/circuit-breaker.architecture.json](archify/circuit-breaker.architecture.json).

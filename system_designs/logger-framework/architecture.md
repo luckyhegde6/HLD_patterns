@@ -35,3 +35,8 @@ flowchart TD
  ACK -->|Yes| DONE[Release buffer]
  ACK -->|No| RETRY[Bounded retry / local spool]
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/logger-framework.architecture.json](archify/logger-framework.architecture.json).

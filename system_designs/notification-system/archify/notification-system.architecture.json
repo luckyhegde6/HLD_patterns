@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Notification Platform — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/notification-system/archify/notification-system.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "event",
+      "label": "Product events",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api",
+      "label": "Notification API",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "prefs",
+      "label": "Consent prefs",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "queue",
+      "label": "Durable queue",
+      "type": "messagebus",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "worker",
+      "label": "Channel workers",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "provider",
+      "label": "Provider adapters",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "status",
+      "label": "Delivery status",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 0
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "event",
+      "to": "api",
+      "label": "notification request"
+    },
+    {
+      "id": "edge2",
+      "from": "api",
+      "to": "prefs",
+      "label": "check consent"
+    },
+    {
+      "id": "edge3",
+      "from": "api",
+      "to": "queue",
+      "label": "enqueue recipient jobs"
+    },
+    {
+      "id": "edge4",
+      "from": "queue",
+      "to": "worker",
+      "label": "deliver"
+    },
+    {
+      "id": "edge5",
+      "from": "worker",
+      "to": "provider",
+      "label": "send"
+    },
+    {
+      "id": "edge6",
+      "from": "provider",
+      "to": "status",
+      "label": "webhook receipt"
+    }
+  ]
+}

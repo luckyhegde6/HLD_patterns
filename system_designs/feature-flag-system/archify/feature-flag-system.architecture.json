@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Feature Flag System — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/feature-flag-system/archify/feature-flag-system.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "operator",
+      "label": "Operator",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "control",
+      "label": "Control plane",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "store",
+      "label": "Flag store",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "dist",
+      "label": "Config distribution",
+      "type": "cloud",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "sdk",
+      "label": "SDK local cache",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "app",
+      "label": "Application",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "operator",
+      "to": "control",
+      "label": "publish flag"
+    },
+    {
+      "id": "edge2",
+      "from": "control",
+      "to": "store",
+      "label": "validate + persist"
+    },
+    {
+      "id": "edge3",
+      "from": "control",
+      "to": "dist",
+      "label": "version update"
+    },
+    {
+      "id": "edge4",
+      "from": "dist",
+      "to": "sdk",
+      "label": "config snapshot"
+    },
+    {
+      "id": "edge5",
+      "from": "app",
+      "to": "sdk",
+      "label": "evaluate locally"
+    }
+  ]
+}

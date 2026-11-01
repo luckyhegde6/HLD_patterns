@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "URL Shortener — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/url_shortener/archify/url_shortener.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "user",
+      "label": "Browser / mobile",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "edge",
+      "label": "CDN / gateway",
+      "type": "cloud",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "api",
+      "label": "URL service",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "cache",
+      "label": "Redis cache",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "db",
+      "label": "URL mapping store",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "queue",
+      "label": "Analytics queue",
+      "type": "messagebus",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "worker",
+      "label": "Analytics consumers",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 0
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "user",
+      "to": "edge",
+      "label": "GET short code"
+    },
+    {
+      "id": "edge2",
+      "from": "edge",
+      "to": "api",
+      "label": "forward cache miss"
+    },
+    {
+      "id": "edge3",
+      "from": "api",
+      "to": "cache",
+      "label": "lookup mapping"
+    },
+    {
+      "id": "edge4",
+      "from": "cache",
+      "to": "db",
+      "label": "miss → lookup"
+    },
+    {
+      "id": "edge5",
+      "from": "api",
+      "to": "user",
+      "label": "301 / 302 redirect"
+    },
+    {
+      "id": "edge6",
+      "from": "api",
+      "to": "queue",
+      "label": "emit redirect event"
+    },
+    {
+      "id": "edge7",
+      "from": "queue",
+      "to": "worker",
+      "label": "aggregate analytics"
+    }
+  ]
+}

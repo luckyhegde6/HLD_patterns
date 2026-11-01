@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "async-workers-backlog",
+  "title": "Message queue — backlog and worker drain",
+  "sourceDesign": "system_designs/message-queue",
+  "upstream": {
+    "repository": "https://github.com/workersio/breakscale",
+    "engine": "src/sim/engine.ts",
+    "preset": "async-workers",
+    "pinRequired": true
+  },
+  "experiment": {
+    "question": "At what point do producers outpace consumers, and how quickly can a worker pool drain backlog after a burst?",
+    "controls": [
+      "Increase producer offered RPS",
+      "Change worker instances/capacity",
+      "Compare steady and burst traffic when the selected engine supports both"
+    ],
+    "outputs": [
+      "offeredRps",
+      "goodputRps",
+      "errorRate",
+      "queue depth",
+      "worker utilization",
+      "p99"
+    ]
+  },
+  "inputs": [
+    {
+      "name": "averageMessagesPerSecond",
+      "value": null,
+      "unit": "messages/second",
+      "provenance": "TBD",
+      "source": "system_designs/message-queue/requirements.md"
+    },
+    {
+      "name": "peakMessagesPerSecond",
+      "value": null,
+      "unit": "messages/second",
+      "provenance": "TBD",
+      "source": "system_designs/message-queue/requirements.md"
+    },
+    {
+      "name": "messageSize",
+      "value": null,
+      "unit": "bytes",
+      "provenance": "TBD",
+      "source": "system_designs/message-queue/requirements.md"
+    },
+    {
+      "name": "workerInstances",
+      "value": null,
+      "unit": "instances",
+      "provenance": "TBD",
+      "source": "worker capacity plan"
+    },
+    {
+      "name": "consumerServiceMs",
+      "value": null,
+      "unit": "ms/message",
+      "provenance": "TBD",
+      "source": "consumer processing measurements"
+    }
+  ],
+  "safety": "Queue acknowledgement and delivery semantics must be checked in the engine. Simulation is not proof of Kafka/SQS/Pub/Sub durability, ordering or exactly-once processing."
+}

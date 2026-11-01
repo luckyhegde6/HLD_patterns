@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Customer Support AI Agent — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/customer-support-ai-agent/archify/customer-support-ai-agent.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "customer",
+      "label": "Customer channels",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api",
+      "label": "Support API",
+      "type": "cloud",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "auth",
+      "label": "Tenant auth",
+      "type": "security",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "retrieval",
+      "label": "Scoped retrieval",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "agent",
+      "label": "Agent orchestrator",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "policy",
+      "label": "Tool policy gateway",
+      "type": "security",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "approval",
+      "label": "Human approval",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "id": "crm",
+      "label": "CRM / ticketing",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 1
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "customer",
+      "to": "api",
+      "label": "issue"
+    },
+    {
+      "id": "edge2",
+      "from": "api",
+      "to": "auth",
+      "label": "verify tenant"
+    },
+    {
+      "id": "edge3",
+      "from": "auth",
+      "to": "retrieval",
+      "label": "authorized context"
+    },
+    {
+      "id": "edge4",
+      "from": "retrieval",
+      "to": "agent",
+      "label": "evidence"
+    },
+    {
+      "id": "edge5",
+      "from": "agent",
+      "to": "policy",
+      "label": "typed tool proposal"
+    },
+    {
+      "id": "edge6",
+      "from": "policy",
+      "to": "approval",
+      "label": "sensitive action"
+    },
+    {
+      "id": "edge7",
+      "from": "policy",
+      "to": "crm",
+      "label": "approved tool call"
+    }
+  ]
+}

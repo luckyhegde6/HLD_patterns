@@ -36,3 +36,8 @@ flowchart TD
  OK -->|Yes| ALLOW[Consume and allow]
  OK -->|No| THROTTLE[Throttle]
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/rate-limiter.architecture.json](archify/rate-limiter.architecture.json).
