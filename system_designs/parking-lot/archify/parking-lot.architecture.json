@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Parking Lot System — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/parking-lot/archify/parking-lot.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "entry",
+      "label": "Entry gate",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api",
+      "label": "Parking API",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "allocator",
+      "label": "Spot allocator",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "inventory",
+      "label": "Spot inventory",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "ticket",
+      "label": "Ticket service",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "payment",
+      "label": "Fee / payment",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "exit",
+      "label": "Exit gate",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 0
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "entry",
+      "to": "api",
+      "label": "entry request"
+    },
+    {
+      "id": "edge2",
+      "from": "api",
+      "to": "allocator",
+      "label": "vehicle + idempotency key"
+    },
+    {
+      "id": "edge3",
+      "from": "allocator",
+      "to": "inventory",
+      "label": "atomic reserve"
+    },
+    {
+      "id": "edge4",
+      "from": "allocator",
+      "to": "ticket",
+      "label": "issue ticket"
+    },
+    {
+      "id": "edge5",
+      "from": "exit",
+      "to": "payment",
+      "label": "calculate + collect"
+    },
+    {
+      "id": "edge6",
+      "from": "payment",
+      "to": "inventory",
+      "label": "release spot"
+    }
+  ]
+}
