@@ -59,17 +59,36 @@ jobs:
           set -euo pipefail
           mkdir -p dist/archify
           count=0
+          failures=0
+          failed_designs=()
           while IFS= read -r spec; do
             slug="$(basename "$spec" .architecture.json)"
             out="dist/archify/${slug}.architecture.html"
             echo "::group::Archify finalize: ${slug}"
-            node .archify-cli/archify/bin/archify.mjs finalize architecture "$spec" "$out" --quality showcase --json
+            if node .archify-cli/archify/bin/archify.mjs finalize architecture "$spec" "$out" --quality showcase --json; then
+              if test -s "$out"; then
+                count=$((count + 1))
+              else
+                echo "::error::Finalize returned success but HTML output is missing for ${slug}"
+                failures=$((failures + 1))
+                failed_designs+=("$slug: missing HTML after successful finalize")
+              fi
+            else
+              failures=$((failures + 1))
+              failed_designs+=("$slug: finalize failed; inspect the JSON diagnostics above")
+            fi
             echo "::endgroup::"
-            test -s "$out"
-            count=$((count + 1))
           done < <(find system_designs -type f -path "*/archify/*.architecture.json" | sort)
-          test "$count" -eq 17
-          echo "Successfully finalized ${count} interactive Archify HTML exports."
+          if test "$count" -ne 17; then
+            echo "::error::Expected 17 successful HTML exports; got ${count}"
+            failures=$((failures + 1))
+          fi
+          if test "$failures" -gt 0; then
+            printf '::error::Archify failed for %s design(s):\n' "$failures"
+            printf ' - %s\n' "${failed_designs[@]}"
+            exit 1
+          fi
+          echo "Successfully finalized all ${count} interactive Archify HTML exports."
 
       - name: Upload interactive HTML exports and validation receipts
         if: always()
