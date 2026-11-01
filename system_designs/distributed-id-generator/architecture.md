@@ -32,3 +32,8 @@ flowchart TD
  FULL -->|Yes| NEXT[Wait for next time unit]
  NEXT --> T
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/distributed-id-generator.architecture.json](archify/distributed-id-generator.architecture.json).
