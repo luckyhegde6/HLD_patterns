@@ -8,3 +8,8 @@
 6. Cover metrics, tuning, testing and rollout.
 
 Follow-ups: What if traffic is low? What if one tenant causes failures? How do you prevent synchronized half-open probes? What if fallback is stale?
+
+
+## Enhanced walkthrough
+
+Use the [system-specific 10-minute visual walkthrough](visual_explainer.md) alongside this checklist. It includes the architecture narration, critical request sequence, invariants, failure paths, trade-offs and follow-up questions. Practice drawing the diagram from memory before reading the notes.
