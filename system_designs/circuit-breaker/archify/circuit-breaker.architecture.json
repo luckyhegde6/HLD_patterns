@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Circuit Breaker — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/circuit-breaker/archify/circuit-breaker.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "caller",
+      "label": "Caller service",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "breaker",
+      "label": "Circuit breaker",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "policy",
+      "label": "Threshold policy",
+      "type": "security",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "dep",
+      "label": "Downstream dependency",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "fallback",
+      "label": "Fallback response",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "metrics",
+      "label": "Failure metrics",
+      "type": "cloud",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "caller",
+      "to": "breaker",
+      "label": "request"
+    },
+    {
+      "id": "edge2",
+      "from": "breaker",
+      "to": "policy",
+      "label": "evaluate state"
+    },
+    {
+      "id": "edge3",
+      "from": "breaker",
+      "to": "dep",
+      "label": "allowed call"
+    },
+    {
+      "id": "edge4",
+      "from": "breaker",
+      "to": "fallback",
+      "label": "open / reject"
+    },
+    {
+      "id": "edge5",
+      "from": "breaker",
+      "to": "metrics",
+      "label": "state + failures"
+    }
+  ]
+}
