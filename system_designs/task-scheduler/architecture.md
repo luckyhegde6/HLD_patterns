@@ -36,3 +36,8 @@ stateDiagram-v2
  Scheduled --> Cancelled
  Queued --> Cancelled
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/task-scheduler.architecture.json](archify/task-scheduler.architecture.json).
