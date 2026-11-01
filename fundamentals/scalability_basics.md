@@ -1,85 +1,92 @@
 # Scalability Basics
 
-Scalability is the ability to handle increased demand while meeting latency, availability, correctness and cost goals. Begin with workload measurements and bottlenecks; do not scale components just because a reference diagram includes them.
+Scalability means increasing workload while preserving latency, availability, correctness and cost goals. Begin with workload and bottleneck evidence; do not add distributed components just because a diagram includes them.
 
-## 1. Scale up vs scale out
-
-```mermaid
-flowchart TB
-    A[Growing workload] --> B{Can a larger instance meet goals?}
-    B -->|Yes| C[Vertical scaling]
-    B -->|No / diminishing returns| D[Horizontal scaling]
-    C --> E[Measure cost and failure blast radius]
-    D --> F[Partition work and state]
-    F --> G[Load balancing / queues / sharding]
-    E --> H[Re-measure bottleneck]
-    G --> H
-```
-
-- Vertical scaling: increase CPU, memory, IOPS or network on a node. Simple, but has practical limits and may increase single-node blast radius.
-- Horizontal scaling: add nodes and distribute work. Requires statelessness or partitioned state, routing, coordination and operational automation.
-
-## 2. Little's Law
-
-For a stable system: average concurrency (L = lambda W), where (lambda) is throughput and (W) is average time in the system. It helps relate concurrency, throughput and latency; it does not by itself predict capacity limits.
-
-## 3. Common bottlenecks
-
-| Bottleneck | Signals | Typical response |
-|---|---|---|
-| CPU | High utilization, rising queue time | Profile, optimize, scale compute |
-| Memory | GC pressure, swapping, OOM | Bound caches/requests, optimize allocations |
-| Database | Lock waits, IOPS, connections | Index, query tuning, pooling, read replicas |
-| Network | Saturation, retransmits | Reduce payload, compress, regional placement |
-| Downstream API | 429/timeouts | Quotas, bulkheads, async queue, caching |
-| Hot key/partition | Skewed per-key load | Repartition, replicate reads, coalesce requests |
-
-## 4. Capacity planning loop
+## From zero to scale: progressive evolution
 
 ```mermaid
 flowchart LR
-    A[Measure workload] --> B[Estimate average + peak]
-    B --> C[Set latency / availability targets]
-    C --> D[Model resource demand]
-    D --> E[Load and stress test]
-    E --> F{SLO met with headroom?}
-    F -->|No| G[Find bottleneck and change one thing]
-    G --> E
-    F -->|Yes| H[Deploy with autoscaling + alerts]
-    H --> I[Re-measure real traffic]
-    I --> B
+  A[One app + one DB] --> B[Separate app and DB]
+  B --> C[Load balancer + stateless replicas]
+  C --> D[Cache + CDN]
+  D --> E[Queue + worker pool]
+  E --> F[Replicate / partition data]
+  F --> G[Multi-region + DR]
 ```
 
-## 5. Illustrative request growth chart
+Each step should answer a measured constraint and adds operational complexity.
 
-This is a teaching illustration, not a benchmark. A system receiving 1,000 average requests/s today and growing 2× per year would have the following average rate under that assumption:
+## Vertical vs horizontal
+
+| Scale up | Scale out |
+|---|---|
+| Bigger CPU/RAM/IOPS/network on one node | More nodes share workload |
+| Lower coordination complexity | More potential availability/fault isolation |
+| Hardware ceiling | Requires routing and distributed state |
+| Can increase single-node blast radius | Can increase network/consistency complexity |
 
 ```mermaid
-xychart-beta
-    title "Illustrative average request-rate growth (2x/year assumption)"
-    x-axis ["Now", "Year 1", "Year 2", "Year 3", "Year 4"]
-    y-axis "Requests per second" 0 --> 16000
-    line [1000, 2000, 4000, 8000, 16000]
+flowchart TD
+  A[Demand grows] --> B{Is one node resource-bound?}
+  B -->|Yes| C[Profile and scale vertically]
+  C --> D{Still meets SLO and cost?}
+  D -->|Yes| E[Keep simple; monitor]
+  D -->|No| F[Scale horizontally]
+  B -->|No| G[Find actual bottleneck]
+  F --> H[Partition work / externalize state]
+  G --> H
+  H --> I[Re-measure under representative load]
 ```
 
-Real planning must include peak-to-average ratio, geographic skew, burstiness, payload size and downstream limits.
+## Stateless web tier
 
-## 6. AI / agentic implementation guidance
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant LB as Load balancer
+  participant A as API replica A
+  participant B as API replica B
+  participant S as Shared session store
+  C->>LB: Request 1
+  LB->>A: Route to A
+  A->>S: Read/write session
+  A-->>C: Response
+  C->>LB: Request 2
+  LB->>B: Route to B
+  B->>S: Read same session
+  B-->>C: Response
+```
 
-AI workloads add variable token sizes, inference latency, provider quotas, tool fan-out and potentially long-running tasks.
+Move authoritative session state out of app memory so any healthy instance can process the next request.
 
-Design for:
-- token and request budgets per tenant
-- concurrency limits and provider quotas
-- model gateway and explicit timeout/fallback policy
-- asynchronous job orchestration for long tasks
-- caching with tenant-aware keys and freshness rules
-- retrieval limits and bounded context
-- backpressure and cancellation
-- cost per completed workflow, not only cost per token
+## Capacity model
 
-**Prompt:** “Estimate capacity for this model-assisted workflow. Include requests/day, peak QPS, input/output token distributions, concurrent sessions, tool calls per task, provider quota, latency budget and cost assumptions. Mark all unknowns; do not fabricate model throughput or provider pricing.”
+Little's Law for a stable system:
 
-## Interview insight
+`Average concurrency = throughput × average latency`
 
-Start with workload, estimate, bottleneck and SLO. Then explain the simplest scaling mechanism that addresses that bottleneck and how you will know when it stops being sufficient.
+A theoretical concurrent-slot ceiling may be approximated from instances × slots/instance. Actual throughput depends on service time, dependencies, contention, queue limits, CPU, memory and network.
+
+## Bottleneck signals
+
+| Tier | Signals | Candidate actions |
+|---|---|---|
+| Edge | Cache miss, origin bandwidth | CDN policy, compression |
+| API | CPU, event-loop lag, request queue | Profile, concurrency, horizontal scale |
+| DB | Lock waits, slow queries, connection pool | Index/query tuning, pooler, replica, partition |
+| Cache | Eviction, hit ratio, hot key | Key design, local coalescing |
+| Queue | Oldest age, lag, retry spike | Scale workers, partition, cap producer |
+| External API | 429, timeout, cost | Quota, cache, bulkhead, fallback |
+
+## Scale safely
+
+Keep redundancy at critical tiers; use autoscaling signals that reflect demand and queueing; add headroom and warm-up; control retries and admission; partition only after examining key distribution; test regional failover and restore; track cost per successful business operation.
+
+## Breakscale exercise
+
+Use the [Breakscale workload guide](../system_designs/BREAKSCALE_TESTING.md). Increase offered load and observe goodput, p99, queue depth, cache-origin traffic and component utilization. These are simulated outputs, not production benchmarks.
+
+## References
+
+- [ByteByteGo — Scale from Zero to Millions of Users](https://bytebytego.com/courses/system-design-interview/scale-from-zero-to-millions-of-users)
+- [Google SRE Book](https://sre.google/sre-book/table-of-contents/)
