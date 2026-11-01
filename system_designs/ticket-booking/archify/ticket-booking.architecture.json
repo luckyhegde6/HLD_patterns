@@ -70,7 +70,7 @@
     },
     {
       "id": "payment",
-      "label": "Payment orchestrator",
+      "label": "Payment flow",
       "type": "backend",
       "sublabel": "Conceptual component",
       "row": 2,
