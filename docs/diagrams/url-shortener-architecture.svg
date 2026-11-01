@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">URL Shortener conceptual architecture</title>
+  <desc id="desc">Client traffic reaches DNS and CDN, then load balancer, API gateway, URL service, Redis cache and persistent URL store. An optional event pipeline feeds analytics.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f8fafc}.node{fill:#fff;stroke:#334155;stroke-width:2;rx:14}.edge{stroke:#475569;stroke-width:2.5;fill:none;marker-end:url(#arrow)}.async{stroke:#7c3aed;stroke-width:2.5;stroke-dasharray:8 6;fill:none;marker-end:url(#arrowPurple)}.label{font:600 20px system-ui,sans-serif;fill:#0f172a}.sub{font:14px system-ui,sans-serif;fill:#475569}.title{font:700 30px system-ui,sans-serif;fill:#0f172a}.foot{font:13px system-ui,sans-serif;fill:#64748b}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#475569"/></marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7c3aed"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="680"/>
+  <text class="title" x="48" y="58">URL Shortener — conceptual request architecture</text>
+  <text class="sub" x="48" y="86">Cache-first redirects · durable URL mappings · asynchronous analytics (optional)</text>
+  <rect class="node" x="48" y="170" width="150" height="86"/><text class="label" x="123" y="207" text-anchor="middle">Client</text><text class="sub" x="123" y="231" text-anchor="middle">Browser / App</text>
+  <rect class="node" x="255" y="170" width="150" height="86"/><text class="label" x="330" y="207" text-anchor="middle">DNS + CDN</text><text class="sub" x="330" y="231" text-anchor="middle">Edge routing</text>
+  <rect class="node" x="462" y="170" width="150" height="86"/><text class="label" x="537" y="207" text-anchor="middle">Load balancer</text><text class="sub" x="537" y="231" text-anchor="middle">Traffic spread</text>
+  <rect class="node" x="669" y="170" width="150" height="86"/><text class="label" x="744" y="207" text-anchor="middle">API gateway</text><text class="sub" x="744" y="231" text-anchor="middle">Auth / validation</text>
+  <rect class="node" x="876" y="170" width="150" height="86"/><text class="label" x="951" y="207" text-anchor="middle">URL service</text><text class="sub" x="951" y="231" text-anchor="middle">Create / redirect</text>
+  <path class="edge" d="M198 213H255M405 213H462M612 213H669M819 213H876"/>
+  <rect class="node" x="824" y="352" width="160" height="86"/><text class="label" x="904" y="390" text-anchor="middle">Redis cache</text><text class="sub" x="904" y="414" text-anchor="middle">Hot mappings</text>
+  <rect class="node" x="1020" y="352" width="150" height="86"/><text class="label" x="1095" y="390" text-anchor="middle">URL store</text><text class="sub" x="1095" y="414" text-anchor="middle">Persistent source</text>
+  <path class="edge" d="M951 256V300H904V352"/><text class="sub" x="916" y="292">lookup</text>
+  <path class="edge" d="M984 395H1020"/><text class="sub" x="1000" y="382" text-anchor="middle">miss</text>
+  <path class="edge" d="M1020 423H984"/><text class="sub" x="1002" y="453" text-anchor="middle">mapping</text>
+  <rect class="node" x="542" y="500" width="180" height="86"/><text class="label" x="632" y="538" text-anchor="middle">Event broker</text><text class="sub" x="632" y="562" text-anchor="middle">Async events</text>
+  <rect class="node" x="800" y="500" width="190" height="86"/><text class="label" x="895" y="538" text-anchor="middle">Analytics workers</text><text class="sub" x="895" y="562" text-anchor="middle">Idempotent consumers</text>
+  <rect class="node" x="1040" y="500" width="130" height="86"/><text class="label" x="1105" y="538" text-anchor="middle">Analytics</text><text class="sub" x="1105" y="562" text-anchor="middle">Store / BI</text>
+  <path class="async" d="M951 256V470H632V500"/><text class="sub" x="750" y="462">UrlCreated / UrlRedirected</text>
+  <path class="async" d="M722 543H800M990 543H1040"/>
+  <text class="foot" x="48" y="642">Conceptual architecture — validate topology, consistency and SLOs against actual requirements.</text>
+</svg>
