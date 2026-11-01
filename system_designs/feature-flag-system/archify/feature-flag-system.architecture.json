@@ -38,7 +38,7 @@
     },
     {
       "id": "store",
-      "label": "Versioned flag store",
+      "label": "Flag store",
       "type": "database",
       "sublabel": "Conceptual component",
       "row": 0,
