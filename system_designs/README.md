@@ -1,6 +1,6 @@
 # System Designs
 
-This directory contains interview-ready HLDs using a consistent format: requirements/workload, architecture and Mermaid diagrams, data model, failure handling, trade-offs, AI/FDE implementation guidance and interview walkthrough.
+This directory contains interview-ready HLDs using a consistent format: requirements/workload, architecture and Mermaid diagrams, data model, failure handling, trade-offs, AI/FDE implementation guidance and interview walkthrough. Each design also has a visual explainer and editable Archify source. The [System design docs and Archify exports workflow](../.github/workflows/system-designs.yml) validates the sources and generates standalone interactive HTML for all 17 designs; download the `archify-interactive-html-and-receipts` artifact from the successful GitHub Actions run. See [Archify export details](ARCHIFY_DIAGRAMS.md).
 
 | Design | Primary focus | Visual explainer + walkthrough |
 |---|---|---|---|
