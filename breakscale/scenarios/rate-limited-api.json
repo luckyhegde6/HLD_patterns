@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "rate-limited-api",
+  "title": "Rate-limited API — offered load versus goodput and latency",
+  "sourceDesign": "system_designs/rate-limiter",
+  "upstream": {
+    "repository": "https://github.com/workersio/breakscale",
+    "engine": "src/sim/engine.ts",
+    "preset": "rate-limited-api",
+    "pinRequired": true
+  },
+  "experiment": {
+    "question": "Does admission control preserve low latency at the cost of rejecting excess offered traffic?",
+    "controls": [
+      "Change offered RPS",
+      "Keep limiter quota fixed",
+      "Compare limiter enabled and bypassed only when topology supports the comparison"
+    ],
+    "outputs": [
+      "offeredRps",
+      "goodputRps",
+      "errorRate",
+      "p50",
+      "p95",
+      "p99",
+      "throttled failures",
+      "backend utilization"
+    ]
+  },
+  "inputs": [
+    {
+      "name": "peakRps",
+      "value": null,
+      "unit": "requests/second",
+      "provenance": "TBD",
+      "source": "system_designs/rate-limiter/requirements.md"
+    },
+    {
+      "name": "quotaRps",
+      "value": null,
+      "unit": "requests/second",
+      "provenance": "TBD",
+      "source": "product policy / gateway telemetry"
+    },
+    {
+      "name": "burst",
+      "value": null,
+      "unit": "requests",
+      "provenance": "TBD",
+      "source": "product policy"
+    },
+    {
+      "name": "offeredRpsSweep",
+      "values": [
+        50,
+        100,
+        150,
+        250,
+        500
+      ],
+      "unit": "requests/second",
+      "provenance": "illustrative",
+      "reason": "Demonstration sweep only; replace once peak RPS is known."
+    }
+  ],
+  "safety": "Do not treat simulator throttling as proof of distributed token-bucket consistency or atomicity across regions."
+}

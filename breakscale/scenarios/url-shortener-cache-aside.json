@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "id": "url-shortener-cache-aside",
+  "title": "URL shortener — cache hit rate and origin pressure",
+  "sourceDesign": "system_designs/url_shortener",
+  "upstream": {
+    "repository": "https://github.com/workersio/breakscale",
+    "engine": "src/sim/engine.ts",
+    "preset": "cache-aside",
+    "pinRequired": true
+  },
+  "experiment": {
+    "question": "How does lower cache hit rate change origin load, queueing, p99 and successful goodput?",
+    "controls": [
+      "Keep offered RPS and topology constant",
+      "Change only cache hit rate per run"
+    ],
+    "outputs": [
+      "offeredRps",
+      "goodputRps",
+      "errorRate",
+      "p50",
+      "p95",
+      "p99",
+      "origin queue depth",
+      "origin utilization"
+    ]
+  },
+  "inputs": [
+    {
+      "name": "redirectsPerDay",
+      "value": 100000000,
+      "unit": "requests/day",
+      "provenance": "requirement-derived",
+      "source": "system_designs/url_shortener/requirements.md"
+    },
+    {
+      "name": "averageRedirectRps",
+      "value": 1157.4,
+      "unit": "requests/second",
+      "provenance": "requirement-derived",
+      "derivation": "100,000,000 / 86,400"
+    },
+    {
+      "name": "offeredRpsSweep",
+      "values": [
+        1157.4,
+        1500,
+        2500,
+        4000
+      ],
+      "unit": "requests/second",
+      "provenance": "interview-assumption",
+      "reason": "Exploratory load points; not supplied peak traffic."
+    },
+    {
+      "name": "cacheHitRateSweep",
+      "values": [
+        0.95,
+        0.9,
+        0.8,
+        0.6
+      ],
+      "unit": "fraction",
+      "provenance": "illustrative",
+      "reason": "Sensitivity sweep; no production cache-hit measurement was provided."
+    },
+    {
+      "name": "cacheServiceMs",
+      "value": null,
+      "unit": "ms",
+      "provenance": "TBD",
+      "reason": "Obtain measured p50 service time or state an explicit interview assumption."
+    },
+    {
+      "name": "originServiceMs",
+      "value": null,
+      "unit": "ms",
+      "provenance": "TBD",
+      "reason": "Obtain measured p50 service time or state an explicit interview assumption."
+    }
+  ],
+  "safety": "Simulated architecture experiment only; not an HTTP load test or benchmark of Redis/Postgres."
+}

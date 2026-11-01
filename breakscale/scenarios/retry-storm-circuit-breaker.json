@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "retry-storm-circuit-breaker",
+  "title": "Retry storm and circuit breaker — dependency overload",
+  "sourceDesign": "system_designs/circuit-breaker",
+  "upstream": {
+    "repository": "https://github.com/workersio/breakscale",
+    "engine": "src/sim/engine.ts",
+    "preset": "retry-storm",
+    "pinRequired": true
+  },
+  "experiment": {
+    "question": "How do timeouts and retries amplify offered load, and can a breaker contain calls to a failing dependency?",
+    "controls": [
+      "Baseline retry topology",
+      "Disable or cap retries",
+      "Enable breaker topology",
+      "Inject dependency errors or slow service"
+    ],
+    "outputs": [
+      "offeredRps",
+      "goodputRps",
+      "errorRate",
+      "p99",
+      "dependency offered RPS",
+      "dependency utilization",
+      "rejected/throttled outcomes"
+    ]
+  },
+  "inputs": [
+    {
+      "name": "offeredRps",
+      "value": 150,
+      "unit": "requests/second",
+      "provenance": "interview-assumption",
+      "source": "Breakscale upstream challenge 'Stop the storm' load; not source system requirements."
+    },
+    {
+      "name": "dependencyErrorRate",
+      "value": 0.5,
+      "unit": "fraction",
+      "provenance": "illustrative",
+      "reason": "Fault-injection starting point; vary it deliberately."
+    },
+    {
+      "name": "timeoutMs",
+      "value": 250,
+      "unit": "ms",
+      "provenance": "illustrative",
+      "reason": "Upstream challenge narrative; not a production timeout."
+    },
+    {
+      "name": "retries",
+      "value": 2,
+      "unit": "attempts",
+      "provenance": "illustrative",
+      "reason": "Upstream challenge narrative; not a production retry policy."
+    }
+  ],
+  "safety": "Simulated retry/failure behaviour only; it cannot validate downstream side effects, idempotency, payment safety or real provider failure semantics."
+}
