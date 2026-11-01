@@ -38,7 +38,7 @@
     },
     {
       "id": "optimizer",
-      "label": "Assignment optimizer",
+      "label": "Dispatch optimizer",
       "type": "backend",
       "sublabel": "Conceptual component",
       "row": 0,
