@@ -38,7 +38,7 @@
     },
     {
       "id": "prefs",
-      "label": "Preferences / consent",
+      "label": "Consent prefs",
       "type": "database",
       "sublabel": "Conceptual component",
       "row": 0,
