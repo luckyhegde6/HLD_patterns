@@ -38,7 +38,7 @@
     },
     {
       "id": "identity",
-      "label": "Trusted identity + policy",
+      "label": "Identity + policy",
       "type": "security",
       "sublabel": "Conceptual component",
       "row": 0,
