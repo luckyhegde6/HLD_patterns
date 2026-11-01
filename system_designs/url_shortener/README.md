@@ -1,183 +1,61 @@
-# URL Shortener – High Level Design
+# URL Shortener — High-Level Design
 
-## 1. Problem Statement
-Shorten long URLs and redirect users reliably at scale.
+## Problem
 
-## 2. Requirements
-### Functional
-- Generate short URL
-- Redirect to original URL
+Shorten long URLs and redirect users reliably. The original requirements define a read-heavy system with a stated target of less than 50 ms for cache-hit redirects and 99.99% availability.
 
-### Non-Functional
-- Low latency (<50ms)
-- High availability (99.99%)
-- Horizontal scalability
-- Analytics support (optional)
+## Requirements and baseline workload
 
-## 3. Capacity Estimation
-- Read QPS
-- Write QPS
-- Storage growth per year
+- Create a short URL from a long URL.
+- Redirect a short code to its original URL.
+- Optional custom aliases and expiry.
+- Supplied workload assumption: 1M new URLs/day and 100M redirects/day (roughly 100:1 reads to writes).
+- Supplied storage assumption: approximately 160 bytes per mapping, or about 58 GB/year before indexes, replicas and backups.
 
-## 4. High-Level Architecture
-(Insert diagram)
+See [requirements and assumptions](requirements.md).
 
-## 5. Data Model
-- Key → Value mapping
-- Indexing strategy
+## Architecture
 
-## 6. Core Components
-- API Gateway
-- URL Service
-- Cache
-- Database
+The system is stateless at the application tier and cache-first for redirects. Redis is an optimization; the persistent mapping store is the source of truth. See the [full architecture diagrams](architecture.md).
 
-## 7. Scaling Strategy
-- Caching (Redis)
-- Sharding
-- Read replicas
+![Conceptual URL shortener architecture](../../docs/diagrams/url-shortener-architecture.svg)
 
-## 8. Failure Scenarios
-- Cache miss storm
-- DB outage
-- Hot keys
+## Critical flows
 
-## 9. Trade-offs
-- SQL vs NoSQL
-- Base62 vs hash
-- Strong vs eventual consistency
+- [Redirect sequence and cache miss path](architecture.md#3-redirect-sequence)
+- [URL creation and persistence](architecture.md#4-url-creation-sequence)
+- [Cache failure and recovery decision](architecture.md#5-cache-aside-flow-and-failure-handling)
+- [Asynchronous analytics](architecture.md#7-analytics-event-flow)
 
-## 🔥 MASTER PROMPT — URL Shortener (TypeScript, Deployable)
-```
-You are a senior backend engineer and system architect.
+## Data model
 
-Build a fully deployable URL Shortener application in **TypeScript**, strictly following
-a production-grade High Level Design inspired by ByteByteGo and senior system design interviews.
+The minimum entity is a short-code mapping to a long URL, with creation and optional expiry metadata. Analytics events are a separate optional capability. The data model diagram is in [architecture.md](architecture.md#6-data-model).
 
-========================
-ARCHITECTURAL CONSTRAINTS
-========================
+## Scaling and trade-offs
 
-1. Architecture
-- Stateless backend services
-- Cache-first read path
-- Eventual consistency
-- Availability prioritized over strong consistency
+- Keep the redirect path deterministic and cache-first.
+- Add CDN caching for globally popular redirects where redirect status and expiry semantics permit it.
+- Add sharding only after storage, write throughput or index limits justify it.
+- Keep analytics asynchronous and idempotent.
+- Evaluate primary/replica routing against the product's read-after-write and revocation requirements.
+- Prefer a clear active-passive multi-region plan unless active-active is required by an explicit RTO/RPO or geography target.
 
-2. Core Components
-- Backend: Node.js + TypeScript
-- Framework: Express OR Fastify (choose one and justify briefly in comments)
-- Cache: Redis
-- Database: NoSQL (MongoDB or DynamoDB-style abstraction)
-- Frontend: Minimal UI (HTML + CSS or minimal React) ONLY for:
-  - Input long URL
-  - Display shortened URL
-- Deployment: Docker + docker-compose
+## AI / Agentic extensions
 
-3. Short Code Strategy
-- Use Base62 encoding
-- Generate short codes from a monotonically increasing ID
-- Avoid hashing collisions
+AI does not belong in the redirect path. Use it selectively for read-only natural-language analytics, support assistance or abuse investigation. Any state-changing action must go through an authorized admin API and explicit policy/approval workflow.
 
-4. Data Model
-ShortUrl {
-  shortCode: string (primary key)
-  longUrl: string
-  createdAt: Date
-  expiresAt?: Date
-}
+See the [AI Architect / FDE implementation guide](AI_FDE_IMPLEMENTATION.md).
 
-========================
-FUNCTIONAL REQUIREMENTS
-========================
+## Interview walkthrough (10 minutes)
 
-- POST /shorten
-  - Accepts a long URL
-  - Returns a short URL
-- GET /:shortCode
-  - Redirects to the original URL
-- Optional:
-  - URL expiration
-  - Custom alias
+1. Clarify create, redirect, alias, expiration and analytics scope.
+2. Estimate read/write QPS and storage; explain the read-heavy workload.
+3. Draw the cache-first read path and durable write path.
+4. Explain code generation and uniqueness/collision handling.
+5. Walk through cache miss, DB outage, hot key and replication lag.
+6. Discuss sharding, CDN, queueing and multi-region only when needed.
+7. Close with latency, availability, cost and operational trade-offs.
 
-========================
-NON-FUNCTIONAL REQUIREMENTS
-========================
+## Implementation prompt
 
-- Redirect latency < 50ms (cache hit)
-- Horizontal scalability
-- Cache-aside strategy
-- Graceful degradation on cache failure
-
-========================
-SYSTEM DESIGN REQUIREMENTS
-========================
-
-Implement:
-- Cache-aside strategy (Redis → DB fallback)
-- TTL-based cache expiration
-- Negative caching for missing keys
-- Rate limiting on URL creation
-- Basic input validation
-- Structured logging
-- Health check endpoint
-
-========================
-CODE QUALITY REQUIREMENTS
-========================
-
-- Strict TypeScript
-- Clear folder structure
-- SOLID principles where applicable
-- Comments explaining WHY decisions were made
-- No unnecessary abstractions
-- Environment-based configuration
-
-========================
-PROJECT STRUCTURE
-========================
-
-Generate the full project with:
-- /backend
-  - /src
-    - routes
-    - services
-    - repositories
-    - cache
-    - utils
-    - config
-  - Dockerfile
-- /frontend
-  - Minimal UI (no heavy styling)
-- docker-compose.yml
-- README.md with:
-  - Architecture explanation
-  - How to run locally
-  - Design trade-offs
-  - Scaling & failure discussion
-
-========================
-ADVANCED CONSIDERATIONS
-========================
-
-- Add Mermaid diagram in README.md
-- Include a 10-minute interview walkthrough section
-- Add notes on:
-  - Scaling
-  - Failure modes
-  - Security considerations
-  - Cost optimizations
-
-========================
-OUTPUT INSTRUCTIONS
-========================
-
-- Generate all necessary files
-- Provide complete, runnable code
-- Do NOT skip implementations
-- Do NOT over-engineer
-- Assume this will be reviewed by a senior interviewer
-
-This is a production system, not a demo.
-
-```
+Use the repository's [AI/Agentic implementation guidelines](../../docs/AI_AGENTIC_IMPLEMENTATION_GUIDELINES.md) and the [AI/FDE prompt](AI_FDE_IMPLEMENTATION.md#7-prompt-for-an-agentic-implementation-slice).
