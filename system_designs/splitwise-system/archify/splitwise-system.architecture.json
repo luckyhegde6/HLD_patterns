@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Expense Sharing System — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/splitwise-system/archify/splitwise-system.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "user",
+      "label": "Users",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api",
+      "label": "Expense API",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "calc",
+      "label": "Split calculator",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "ledger",
+      "label": "Expense ledger",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "events",
+      "label": "Expense events",
+      "type": "messagebus",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "projection",
+      "label": "Balance projection",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "balances",
+      "label": "Balance store",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 0
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "user",
+      "to": "api",
+      "label": "add expense"
+    },
+    {
+      "id": "edge2",
+      "from": "api",
+      "to": "calc",
+      "label": "validate split"
+    },
+    {
+      "id": "edge3",
+      "from": "calc",
+      "to": "ledger",
+      "label": "append entries"
+    },
+    {
+      "id": "edge4",
+      "from": "ledger",
+      "to": "events",
+      "label": "publish expense"
+    },
+    {
+      "id": "edge5",
+      "from": "events",
+      "to": "projection",
+      "label": "update balances"
+    },
+    {
+      "id": "edge6",
+      "from": "projection",
+      "to": "balances",
+      "label": "persist net balances"
+    }
+  ]
+}
