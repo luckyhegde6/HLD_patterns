@@ -46,7 +46,7 @@
     },
     {
       "id": "dep",
-      "label": "Downstream dependency",
+      "label": "Dependency",
       "type": "external",
       "sublabel": "Conceptual component",
       "row": 1,
