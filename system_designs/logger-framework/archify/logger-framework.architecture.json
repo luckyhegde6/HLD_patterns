@@ -38,7 +38,7 @@
     },
     {
       "id": "buffer",
-      "label": "Local buffer / sampling",
+      "label": "Buffer + sampling",
       "type": "backend",
       "sublabel": "Conceptual component",
       "row": 0,
@@ -70,7 +70,7 @@
     },
     {
       "id": "sinks",
-      "label": "Search + object store",
+      "label": "Search + object",
       "type": "database",
       "sublabel": "Conceptual component",
       "row": 2,
