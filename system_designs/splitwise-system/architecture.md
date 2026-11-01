@@ -31,3 +31,8 @@ flowchart TD
  SUM -->|Yes| POST[Append ledger entries]
  POST --> PROJ[Update balances]
 ```
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/splitwise-system.architecture.json](archify/splitwise-system.architecture.json).
