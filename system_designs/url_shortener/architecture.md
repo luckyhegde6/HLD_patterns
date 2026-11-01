@@ -251,3 +251,8 @@ This assumes 1M newly created URLs each day, 160 bytes per record and no deletio
 | Multi-region | Prefer active-passive absent a strong need | RTO/RPO or geography requirements justify active-active |
 
 See [requirements](requirements.md), [failure modes](failure_modes.md), [consistency and replication](consistency_and_replication.md), [patterns applied](patterns_applied.md), and the [AI / FDE extension](AI_FDE_IMPLEMENTATION.md).
+
+
+## Visual explainer
+
+See [the enhanced visual architecture, critical sequence, failure/recovery flow, AWS/GCP starter mapping and interview walkthrough](visual_explainer.md). Editable Archify source: [archify/url_shortener.architecture.json](archify/url_shortener.architecture.json).
