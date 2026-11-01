@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Distributed Message Queue — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/message-queue/archify/message-queue.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "producer",
+      "label": "Producers",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api",
+      "label": "Publish API",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "partition",
+      "label": "Partitioner",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "broker",
+      "label": "Durable broker log",
+      "type": "messagebus",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "consumer",
+      "label": "Consumer groups",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "dlq",
+      "label": "Dead-letter queue",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "producer",
+      "to": "api",
+      "label": "publish"
+    },
+    {
+      "id": "edge2",
+      "from": "api",
+      "to": "partition",
+      "label": "key + route"
+    },
+    {
+      "id": "edge3",
+      "from": "partition",
+      "to": "broker",
+      "label": "append replicated"
+    },
+    {
+      "id": "edge4",
+      "from": "broker",
+      "to": "consumer",
+      "label": "deliver / poll"
+    },
+    {
+      "id": "edge5",
+      "from": "consumer",
+      "to": "dlq",
+      "label": "retry exhausted"
+    }
+  ]
+}
