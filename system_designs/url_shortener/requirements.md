@@ -1,86 +1,56 @@
-# Requirements
+# URL Shortener — Requirements and Capacity Assumptions
 
-## Functional Requirements
+## Functional requirements
 
-- Generate a short URL for a given long URL
-- Redirect users from short URL to original URL
-- Support custom aliases (optional)
-- Support URL expiration (optional)
+- Generate a short URL for a given long URL.
+- Redirect users from a short URL to its original URL.
+- Optional custom aliases.
+- Optional URL expiration.
 
----
+## Non-functional requirements
 
-## Non-Functional Requirements
+- Low-latency redirects: the stated target is under 50 ms on a cache hit.
+- High availability: the stated target is 99.99%.
+- Horizontal scalability.
+- Durable storage; URLs should not be lost.
+- Read-heavy access pattern.
 
-- Low latency redirects (< 50 ms)
-- High availability (99.99%)
-- Horizontally scalable
-- Durable storage (URLs should not be lost)
-- Read-heavy system
+## Supplied traffic assumptions
 
-# Capacity Estimation
+| Input | Assumption |
+|---|---:|
+| New URLs per day | 1,000,000 |
+| Redirects per day | 100,000,000 |
+| Read/write ratio | 100:1 |
+| Average long URL | 100 bytes |
+| Short code | 7 bytes |
+| Additional metadata | 50 bytes |
+| Approx. mapping record | 160 bytes |
 
-## Traffic Assumptions
+## Derived throughput
 
-- New URLs created per day: 1 million
-- Redirects per day: 100 million
-- Read-to-write ratio: 100:1
+- Writes: 1,000,000 / 86,400 ≈ 11.6 requests/s (rounded to ~12).
+- Reads: 100,000,000 / 86,400 ≈ 1,157 requests/s (rounded to ~1,200).
 
----
+These are daily averages. Peak QPS requires a peak-to-average multiplier and traffic distribution, neither of which is specified in the original assumptions.
 
-## Storage Estimation
+## Storage estimate
 
-Assume:
-- Average long URL length: 100 bytes
-- Short code: 7 bytes
-- Metadata: 50 bytes
+1,000,000 URLs/day × 365 days × 160 bytes ≈ 58.4 GB/year.
 
-Total per record ≈ 160 bytes
+This is raw record payload only. Indexes, replicas, backups, tombstones, analytics events and database overhead increase actual provisioned storage. URL expiry and deletion can reduce retained data; no retention assumption is supplied.
 
-Yearly storage:
-1M URLs/day × 365 × 160 bytes ≈ 58 GB/year
+## Capacity and latency diagrams
 
----
+See [illustrative charts](architecture.md#9-latency-and-capacity-visuals). The latency breakdown is a design budget, not measured performance. Use production traces to validate p50/p95/p99.
 
-## Throughput Estimation
+## Open questions for an interview
 
-- Writes: ~12 requests/sec
-- Reads: ~1,200 requests/sec
-
-Conclusion: System is **read-heavy**, making caching mandatory.
-
-# High Level Architecture
-
-The system is composed of stateless services backed by a cache and a persistent database.
-
-## Core Components
-
-- Client (Browser / Mobile App)
-- Load Balancer
-- API Gateway
-- URL Service
-- Cache (Redis)
-- Database (NoSQL)
-
-# Core Components
-
-## Load Balancer
-- Distributes traffic across API servers
-- Improves availability and scalability
-
-## API Gateway
-- Handles authentication, validation, and routing
-- Shields backend services
-
-## URL Service
-- Generates short codes
-- Handles redirects
-- Stateless to allow horizontal scaling
-
-## Cache (Redis)
-- Stores hot URL mappings
-- Reduces database load
-- Improves latency
-
-## Database
-- Persistent storage for URL mappings
-- Optimized for key-value access
+- What peak-to-average traffic ratio should be planned for?
+- Are redirects permanent (301) or temporary (302)?
+- Is custom alias uniqueness global or tenant-scoped?
+- Can a just-created URL be redirected immediately (read-after-write)?
+- How quickly must a revoked URL stop redirecting globally?
+- What is the expected retention and expiry behavior?
+- Are analytics required, and at what granularity?
+- What are the RTO and RPO targets for regional failure?
