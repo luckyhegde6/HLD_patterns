@@ -62,7 +62,7 @@
     },
     {
       "id": "obs",
-      "label": "Clock / collision metrics",
+      "label": "Clock + collision",
       "type": "cloud",
       "sublabel": "Conceptual component",
       "row": 1,
