@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Distributed Task Scheduler — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/task-scheduler/archify/task-scheduler.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "client",
+      "label": "Client",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api",
+      "label": "Scheduler API",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "store",
+      "label": "Job store",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "scanner",
+      "label": "Due-job scanner",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "queue",
+      "label": "Execution queue",
+      "type": "messagebus",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "worker",
+      "label": "Worker fleet",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "handler",
+      "label": "Task handler",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 0
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "client",
+      "to": "api",
+      "label": "create / update job"
+    },
+    {
+      "id": "edge2",
+      "from": "api",
+      "to": "store",
+      "label": "persist schedule"
+    },
+    {
+      "id": "edge3",
+      "from": "scanner",
+      "to": "store",
+      "label": "claim due job lease"
+    },
+    {
+      "id": "edge4",
+      "from": "scanner",
+      "to": "queue",
+      "label": "enqueue token"
+    },
+    {
+      "id": "edge5",
+      "from": "queue",
+      "to": "worker",
+      "label": "deliver"
+    },
+    {
+      "id": "edge6",
+      "from": "worker",
+      "to": "handler",
+      "label": "execute"
+    },
+    {
+      "id": "edge7",
+      "from": "worker",
+      "to": "store",
+      "label": "complete / retry"
+    }
+  ]
+}
