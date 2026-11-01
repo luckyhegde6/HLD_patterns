@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Ticket Booking System — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/ticket-booking/archify/ticket-booking.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "user",
+      "label": "Users",
+      "type": "external",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "edge",
+      "label": "Waiting room",
+      "type": "cloud",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "api",
+      "label": "Booking API",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "inventory",
+      "label": "Inventory service",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "db",
+      "label": "Inventory store",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "hold",
+      "label": "Hold service",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "payment",
+      "label": "Payment orchestrator",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "id": "ticket",
+      "label": "Ticket issuance",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 2,
+      "col": 1
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "user",
+      "to": "edge",
+      "label": "join sale"
+    },
+    {
+      "id": "edge2",
+      "from": "edge",
+      "to": "api",
+      "label": "admit request"
+    },
+    {
+      "id": "edge3",
+      "from": "api",
+      "to": "inventory",
+      "label": "check availability"
+    },
+    {
+      "id": "edge4",
+      "from": "inventory",
+      "to": "db",
+      "label": "atomic hold"
+    },
+    {
+      "id": "edge5",
+      "from": "api",
+      "to": "hold",
+      "label": "hold token"
+    },
+    {
+      "id": "edge6",
+      "from": "hold",
+      "to": "payment",
+      "label": "checkout"
+    },
+    {
+      "id": "edge7",
+      "from": "payment",
+      "to": "ticket",
+      "label": "confirm + issue"
+    }
+  ]
+}
