@@ -38,7 +38,7 @@
     },
     {
       "id": "orch",
-      "label": "Payment orchestrator",
+      "label": "Payment flow",
       "type": "backend",
       "sublabel": "Conceptual component",
       "row": 0,
@@ -54,7 +54,7 @@
     },
     {
       "id": "psp",
-      "label": "Provider adapter / PSP",
+      "label": "PSP adapter",
       "type": "external",
       "sublabel": "Conceptual component",
       "row": 1,
@@ -70,7 +70,7 @@
     },
     {
       "id": "recon",
-      "label": "Reconciliation worker",
+      "label": "Reconcile worker",
       "type": "backend",
       "sublabel": "Conceptual component",
       "row": 2,
