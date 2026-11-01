@@ -1,0 +1,79 @@
+name: System design docs and Archify exports
+
+on:
+  pull_request:
+    paths:
+      - "system_designs/**"
+      - "scripts/validate-system-designs.mjs"
+      - ".github/workflows/system-designs.yml"
+  push:
+    branches: [main]
+    paths:
+      - "system_designs/**"
+      - "scripts/validate-system-designs.mjs"
+      - ".github/workflows/system-designs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: system-designs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate source structure and documentation
+        run: node scripts/validate-system-designs.mjs
+
+      - name: Install Archify CLI source (pinned release)
+        run: |
+          git clone --depth 1 --branch v3.2.0 https://github.com/tt-a1i/archify.git .archify-cli
+          if [ -f .archify-cli/package-lock.json ]; then
+            npm ci --prefix .archify-cli
+          fi
+          node .archify-cli/bin/archify.mjs doctor
+
+      - name: Generate and finalize all interactive HTML exports
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/archify
+          count=0
+          while IFS= read -r spec; do
+            slug="$(basename "$spec" .architecture.json)"
+            design_dir="$(dirname "$(dirname "$spec")")"
+            out="dist/archify/${slug}.architecture.html"
+            receipt="dist/archify/${slug}.finalize.json"
+            summary="dist/archify/${slug}.finalize-summary.json"
+            echo "::group::Archify finalize: ${slug}"
+            node .archify-cli/bin/archify.mjs finalize architecture "$spec" "$out" --quality showcase --json
+            echo "::endgroup::"
+            test -s "$out"
+            test -s "${receipt}" || test -s "${out%.html}.finalize.json"
+            count=$((count + 1))
+          done < <(find system_designs -type f -path "*/archify/*.architecture.json" | sort)
+          test "$count" -eq 17
+          echo "Successfully finalized ${count} interactive Archify HTML exports."
+
+      - name: Upload interactive HTML exports and validation receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: archify-interactive-html-and-receipts
+          path: |
+            dist/archify/*.html
+            dist/archify/*.json
+          if-no-files-found: error
+          retention-days: 30
