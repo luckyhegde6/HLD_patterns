@@ -10,7 +10,7 @@ A visual, interview-focused High-Level Design (HLD) learning repository. The goa
 | Architecture fundamentals | [Fundamentals](fundamentals/) | Explain latency, consistency, caching, queues, data stores and scaling |
 | Distributed patterns | [Patterns](patterns/) | Select sharding, consistent hashing, EDA, queues and sagas with clear trade-offs |
 | Cloud architecture | [Cloud architecture](cloud_architecture/) | Map logical designs to AWS, GCP and multi-cloud deployments |
-| Worked systems | [System designs](system_designs/) | Trace requirements, architecture, APIs, data, failure and scale |
+| Worked systems | [System designs](system_designs/README.md) | Trace requirements, architecture, APIs, data, failure and scale |
 | AI Architect / FDE | [AI & FDE playbook](playbook/ai_architect_fde_playbook.md) | Discover a workflow, evaluate AI fit, integrate models/tools and ship safely |
 
 ## Repository map
@@ -18,7 +18,7 @@ A visual, interview-focused High-Level Design (HLD) learning repository. The goa
 - `fundamentals/` — core distributed-systems concepts
 - `patterns/` — reusable architecture patterns
 - `cloud_architecture/` — provider reference architectures
-- `system_designs/` — end-to-end system case studies
+- `system_designs/` — 15 requested worked HLDs plus URL Shortener and Customer Support AI Agent
 - `playbook/` — interview methods and implementation playbooks
 - `docs/` — shared diagram conventions, AI implementation checklists and visual explainers
 
@@ -50,6 +50,10 @@ All diagrams should be editable text sources (Mermaid or SVG). Diagrams are expl
 ## Agentic implementation standard
 
 Use the [AI / Agentic HLD checklist](docs/AI_AGENTIC_IMPLEMENTATION_GUIDELINES.md) with every system. Agents must inspect the repository, propose a design before broad edits, implement thin vertical slices, add failure-path tests, and report exact verification results. Never let a model grant itself permissions or treat generated tool arguments as trusted.
+
+## Worked systems
+
+See the [System Designs catalog](system_designs/README.md) for the full index and study order. The catalog includes API Gateway, Cache System, Circuit Breaker, Distributed ID Generator, Elevator System, Feature Flag System, Logger Framework, Message Queue, Notification System, Parking Lot, Payment Processing, Rate Limiter, Splitwise, Task Scheduler, Ticket Booking and Customer Support AI Agent.
 
 ## Worked example: URL Shortener
 
