@@ -58,3 +58,13 @@ Standalone SVGs should:
 - avoid remote fonts and embedded external images
 - include a small footer such as “Conceptual architecture — validate against requirements”
 - be generated from the same source specification as the Mermaid diagram where feasible
+
+
+## Fundamentals and cloud learning-path visuals
+
+The three top-level learning paths should each have a section-level `README.md` that works as a visual index:
+- `fundamentals/README.md`: request path, latency, cache-aside, async queue and data-store selection.
+- `patterns/README.md`: pattern selection tree and one conceptual diagram per major pattern.
+- `cloud_architecture/README.md`: parallel AWS/GCP reference deployments, workload-to-service map, trust boundaries and recovery.
+
+For AWS/GCP mappings, use “starting point” language, not equivalence claims. Explicitly flag services that have different data models, delivery semantics, scope or consistency. Validate product capabilities and names against current provider documentation when making production recommendations.

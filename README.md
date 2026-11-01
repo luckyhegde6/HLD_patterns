@@ -7,9 +7,9 @@ A visual, interview-focused High-Level Design (HLD) learning repository. The goa
 | Path | Start here | Outcome |
 |---|---|---|
 | HLD interview foundations | [Approach an HLD](fundamentals/how_to_approach_system_design.md) · [Interview playbook](playbook/how_to_approach_hld.md) | Structured 45–60 minute system-design discussion |
-| Architecture fundamentals | [Fundamentals](fundamentals/) | Explain latency, consistency, caching, queues, data stores and scaling |
-| Distributed patterns | [Patterns](patterns/) | Select sharding, consistent hashing, EDA, queues and sagas with clear trade-offs |
-| Cloud architecture | [Cloud architecture](cloud_architecture/) | Map logical designs to AWS, GCP and multi-cloud deployments |
+| Architecture fundamentals | [Fundamentals visual guide](fundamentals/README.md) · [Fundamentals](fundamentals/) | Visualize latency, consistency, caching, queues, data stores and scaling |
+| Distributed patterns | [Patterns visual guide](patterns/README.md) · [Patterns](patterns/) | Select sharding, consistent hashing, EDA, queues and sagas with clear trade-offs |
+| Cloud architecture | [Cloud visual guide](cloud_architecture/README.md) · [Cloud architecture](cloud_architecture/) | Map logical designs to AWS, GCP and multi-cloud deployments |
 | Worked systems | [System designs](system_designs/README.md) | Trace requirements, architecture, APIs, data, failure and scale |
 | AI Architect / FDE | [AI & FDE playbook](playbook/ai_architect_fde_playbook.md) | Discover a workflow, evaluate AI fit, integrate models/tools and ship safely |
 
