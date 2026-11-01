@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Distributed Cache — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/cache-system/archify/cache-system.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "app",
+      "label": "Application",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api",
+      "label": "Cache API",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "router",
+      "label": "Shard router",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "nodes",
+      "label": "Cache cluster",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "origin",
+      "label": "Origin service",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "db",
+      "label": "Source of truth",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "app",
+      "to": "api",
+      "label": "get / set"
+    },
+    {
+      "id": "edge2",
+      "from": "api",
+      "to": "router",
+      "label": "route key"
+    },
+    {
+      "id": "edge3",
+      "from": "router",
+      "to": "nodes",
+      "label": "read / write"
+    },
+    {
+      "id": "edge4",
+      "from": "nodes",
+      "to": "origin",
+      "label": "miss / refill"
+    },
+    {
+      "id": "edge5",
+      "from": "origin",
+      "to": "db",
+      "label": "load authoritative data"
+    }
+  ]
+}
