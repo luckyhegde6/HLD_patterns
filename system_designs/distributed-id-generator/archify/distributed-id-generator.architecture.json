@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Distributed ID Generator — Conceptual HLD",
+    "subtitle": "Architecture based on the design guide; validate assumptions before production use.",
+    "output": "system_designs/distributed-id-generator/archify/distributed-id-generator.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [
+      40,
+      40
+    ],
+    "cols": 3,
+    "cellW": 190,
+    "cellH": 84,
+    "gapX": 64,
+    "gapY": 72
+  },
+  "components": [
+    {
+      "id": "app",
+      "label": "Application",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "sdk",
+      "label": "ID SDK",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "clock",
+      "label": "Time + sequence",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "lease",
+      "label": "Worker ID lease",
+      "type": "database",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "id",
+      "label": "Composed ID",
+      "type": "backend",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "obs",
+      "label": "Clock / collision metrics",
+      "type": "cloud",
+      "sublabel": "Conceptual component",
+      "row": 1,
+      "col": 2
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge1",
+      "from": "app",
+      "to": "sdk",
+      "label": "nextId()"
+    },
+    {
+      "id": "edge2",
+      "from": "sdk",
+      "to": "clock",
+      "label": "read time + sequence"
+    },
+    {
+      "id": "edge3",
+      "from": "sdk",
+      "to": "lease",
+      "label": "worker identity"
+    },
+    {
+      "id": "edge4",
+      "from": "clock",
+      "to": "id",
+      "label": "compose unique ID"
+    },
+    {
+      "id": "edge5",
+      "from": "sdk",
+      "to": "obs",
+      "label": "drift / exhaustion"
+    }
+  ]
+}
