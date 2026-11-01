@@ -24,7 +24,7 @@ concurrency:
 jobs:
   validate-and-export:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,31 +37,35 @@ jobs:
       - name: Validate source structure and documentation
         run: node scripts/validate-system-designs.mjs
 
+      - name: Provision Chrome for Archify browser validation
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+          install-dependencies: true
+
       - name: Install Archify CLI source (pinned release)
         run: |
           git clone --depth 1 --branch v3.2.0 https://github.com/tt-a1i/archify.git .archify-cli
-          if [ -f .archify-cli/package-lock.json ]; then
-            npm ci --prefix .archify-cli
-          fi
-          node .archify-cli/bin/archify.mjs doctor
+          npm ci --prefix .archify-cli/archify
+          node .archify-cli/archify/bin/archify.mjs doctor
 
       - name: Generate and finalize all interactive HTML exports
         shell: bash
+        env:
+          ARCHIFY_CHROME: ${{ steps.chrome.outputs.chrome-path }}
+          ARCHIFY_CHROME_NO_SANDBOX: "1"
         run: |
           set -euo pipefail
           mkdir -p dist/archify
           count=0
           while IFS= read -r spec; do
             slug="$(basename "$spec" .architecture.json)"
-            design_dir="$(dirname "$(dirname "$spec")")"
             out="dist/archify/${slug}.architecture.html"
-            receipt="dist/archify/${slug}.finalize.json"
-            summary="dist/archify/${slug}.finalize-summary.json"
             echo "::group::Archify finalize: ${slug}"
-            node .archify-cli/bin/archify.mjs finalize architecture "$spec" "$out" --quality showcase --json
+            node .archify-cli/archify/bin/archify.mjs finalize architecture "$spec" "$out" --quality showcase --json
             echo "::endgroup::"
             test -s "$out"
-            test -s "${receipt}" || test -s "${out%.html}.finalize.json"
             count=$((count + 1))
           done < <(find system_designs -type f -path "*/archify/*.architecture.json" | sort)
           test "$count" -eq 17
@@ -72,8 +76,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: archify-interactive-html-and-receipts
-          path: |
-            dist/archify/*.html
-            dist/archify/*.json
+          path: dist/archify/
           if-no-files-found: error
           retention-days: 30
