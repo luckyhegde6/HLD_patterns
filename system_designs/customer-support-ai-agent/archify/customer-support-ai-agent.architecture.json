@@ -38,7 +38,7 @@
     },
     {
       "id": "auth",
-      "label": "Tenant authorization",
+      "label": "Tenant auth",
       "type": "security",
       "sublabel": "Conceptual component",
       "row": 0,
