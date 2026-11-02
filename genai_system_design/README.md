@@ -2,6 +2,10 @@
 
 GenAI architecture adds data preparation, retrieval, model quality, inference capacity, safety and evaluation to distributed-systems concerns. Start by framing the task—not by selecting an LLM.
 
+## Product case studies
+
+See the [GenAI case-study catalog](../system_designs/genai/README.md) for ten worked HLDs, including [Gmail Smart Compose](../system_designs/genai/gmail-smart-compose/README.md), [Google Translate](../system_designs/genai/google-translate/README.md), [personal assistant chatbot](../system_designs/genai/personal-assistant-chatbot/README.md), [image captioning](../system_designs/genai/image-captioning/README.md), [RAG](../system_designs/genai/retrieval-augmented-generation/README.md), and image/video generation systems.
+
 ## End-to-end GenAI lifecycle
 
 ```mermaid
