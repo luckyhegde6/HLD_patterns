@@ -1,72 +1,105 @@
-# Consistency Models
+# Consistency Models — What Can a Read Observe?
 
-Consistency describes what values a read is allowed to observe after writes, across replicas and concurrent clients. Choose the weakest model that satisfies product correctness; stronger guarantees can increase coordination, latency and availability costs.
+Consistency describes which values a read may observe after writes and concurrent operations. Start with the business invariant and client-visible behavior, then select a model supported by the database configuration.
 
-## 1. Common models
-
-| Model | Intuition | Typical use |
-|---|---|---|
-| Strong / linearizable | Reads observe the latest completed write in one global order | Account balances, lock ownership, critical inventory |
-| Sequential | All clients observe one order, but it may not match real-time order | Some replicated state |
-| Causal | Causally related operations preserve order | Collaboration and messaging |
-| Eventual | Replicas converge when updates stop | Caches, feeds, analytics projections |
-| Read-your-writes | A client sees its own completed writes | User-facing profile/preferences |
-| Monotonic reads | A client does not move backward to an older version | Session consistency |
-
-These are conceptual guarantees. A database or distributed store may provide a particular subset and require specific configuration.
-
-## 2. Replication and read flow
+## Replication model
 
 ```mermaid
 flowchart LR
-    W[Client write] --> P[(Primary)]
-    P -->|Replicate asynchronously| R1[(Replica A)]
-    P -->|Replicate asynchronously| R2[(Replica B)]
-    Q[Client read] --> Router[Read Router]
-    Router -->|Strong / read-after-write| P
-    Router -->|Staleness allowed| R1
-    R1 -.->|Lag metrics| M[Replication Monitoring]
-    R2 -.->|Lag metrics| M
+  W[Client write] --> P[(Primary)]
+  P -->|Replication stream| R1[(Replica A)]
+  P -->|Replication stream| R2[(Replica B)]
+  Q[Client read] --> ROUTER[Read router]
+  ROUTER -->|Strong / read-after-write| P
+  ROUTER -->|Staleness allowed| R1
+  ROUTER -.-> M[Replication lag monitor]
+  R2 -.-> M
 ```
 
-## 3. Read-after-write decision
+## Main guarantees
+
+| Model | Guarantee | Example |
+|---|---|---|
+| Linearizable / strong | Operations appear to take effect atomically in real-time order | Lock ownership, final inventory allocation |
+| Sequential | All clients see one order, not necessarily wall-clock order | Replicated sequence |
+| Causal | Cause-and-effect order is preserved | Replies after the messages they answer |
+| Eventual | Replicas converge when updates stop | Analytics projections |
+| Read-your-writes | A client sees its own committed updates | Profile edit |
+| Monotonic reads | A client does not move backward after seeing a newer version | Session reads |
+| Bounded staleness | Lag remains within a specified bound | Dashboard with 10-second lag budget |
+
+A product may only provide certain guarantees and configuration modes. Avoid claiming stronger guarantees than the selected store offers.
+
+## Read-after-write decision
 
 ```mermaid
 flowchart TD
-    A[Client performs write] --> B{Does next read require latest value?}
-    B -->|Yes| C[Read primary / session token / version fence]
-    B -->|No| D[Read replica or cache]
-    C --> E[Return consistent view]
-    D --> F{Replica/cache fresh enough?}
-    F -->|Yes| E
-    F -->|No| C
+  A[Client commits a write] --> B{Must next read include this write?}
+  B -->|Yes| C[Primary read or session/version token]
+  B -->|No| D[Replica or cache eligible]
+  C --> E[Return authoritative result]
+  D --> F{Version fresh enough?}
+  F -->|Yes| E
+  F -->|No| C
 ```
 
-## 4. Consistency vs availability
+### Session consistency sequence
 
-In a partition, replicas may be unable to coordinate. A system must decide which operations are allowed to proceed with stale or conflicting data. The right choice depends on business invariants, not on a universal slogan.
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Client
+  participant API as API
+  participant P as Primary
+  participant R as Replica
+  C->>API: Update profile
+  API->>P: Commit update v18
+  P-->>API: Commit v18
+  API-->>C: Success + version token v18
+  C->>API: GET profile (minimum v18)
+  API->>R: Read at least v18
+  alt Replica has version 18
+    R-->>API: Profile v18
+  else Replica is behind
+    R-->>API: Not caught up
+    API->>P: Read from primary
+    P-->>API: Profile v18
+  end
+  API-->>C: Profile v18
+```
 
-Examples:
-- A URL redirect may tolerate short-lived replica lag under some product assumptions.
-- URL revocation may need stronger freshness so a disabled destination stops resolving.
-- Analytics counters can usually be eventually consistent.
-- Payment ledger updates require durable, well-defined ordering and reconciliation.
+## Consistency by workflow
 
-## 5. AI / agentic implementation guidance
+| Workflow | Typical choice | Caveat |
+|---|---|---|
+| Payment ledger | Strong ordering + durable commit | Idempotency and reconciliation still required |
+| Seat reservation | Conditional/strong final write | Search availability can be stale |
+| URL redirect | Eventual/cache can be acceptable | Revocation and expiry may need stronger freshness |
+| Social feed | Eventual projection | Read-your-writes can improve user experience |
+| Analytics | Eventual | Define acceptable lag and correction path |
+| Collaborative editing | Causal/order-aware merge | Conflict-free merge or conflict UI |
 
-The model does not decide consistency semantics. Encode state transitions and invariants in deterministic services.
+## Conflict and recovery toolkit
 
-Require:
-- explicit source of truth for each entity
-- version numbers or timestamps with a stated clock assumption
-- conflict-resolution policy
-- idempotency for retried writes
-- bounded staleness or read-your-writes path where required
-- tests that inject replica lag and network partition
-- explainable fallback when a consistency guarantee cannot be met
+- Version columns / compare-and-set for concurrent updates.
+- Idempotency keys after ambiguous timeouts.
+- Quorum/leader/fencing for ownership and failover.
+- Deterministic conflict resolution where multi-writer behavior is required.
+- Outbox/inbox for database-event consistency.
+- Replica-lag monitoring and read routing for strict sessions.
 
-**Prompt:** “For these business invariants and read/write flows, identify which operations require linearizable, read-your-writes or eventual consistency. State the source of truth, stale-read window and conflict policy. Add tests for replica lag and retry; do not claim a guarantee unsupported by the selected storage system.”
+## Senior interview walkthrough
 
-## Interview insight
+1. State the business invariant.
+2. Draw write ownership and replication direction.
+3. Identify which clients require read-your-writes or strong reads.
+4. Describe partition/failover behavior.
+5. Explain conflict handling and duplicate retries.
+6. State the cost in latency, availability and complexity.
 
-State the invariant first, then choose the consistency model. Explain what a user can observe during replication lag, concurrent writes and network partition.
+## References
+
+- [ByteByteGo — Scale from Zero to Millions of Users](https://bytebytego.com/courses/system-design-interview/scale-from-zero-to-millions-of-users)
+- [CAP theorem](CAP_theorem.md)
+- [Ticket Booking](../system_designs/ticket-booking/README.md)
+- [Payment Processing](../system_designs/payment-processing/README.md)

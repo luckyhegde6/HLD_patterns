@@ -1,64 +1,94 @@
-# Latency, Throughput, and Scaling
+# Latency, Throughput and Scaling
 
----
+Latency is how long one operation takes. Throughput is how many operations finish per unit time. Capacity is the sustainable workload a system can handle while meeting its SLOs.
 
-## Latency
+## End-to-end latency budget
 
-Latency is the time taken for a single request to complete.
+```mermaid
+flowchart LR
+  C[Client / DNS] --> N[Network + TLS]
+  N --> E[Edge / WAF]
+  E --> L[Load balancer]
+  L --> A[Application]
+  A --> R[Cache]
+  R -->|miss| D[(Database)]
+  A --> X[External dependency]
+  A --> RESP[Response]
+```
 
-Sources of latency include:
-- Network hops
-- Disk I/O
-- Serialization and deserialization
-- Lock contention
-- Cache misses
+For serial work, latency adds. For parallel fan-out, completion often waits for the slowest branch. Queue wait can dominate service time near saturation.
 
-Users directly perceive latency, making it critical for user-facing systems.
+## Metrics
 
----
+| Metric | Definition | Why it matters |
+|---|---|---|
+| p50 | Median latency | Typical experience |
+| p95 / p99 | Tail percentiles | Long-tail delays |
+| Throughput | Completed operations / second | Useful work |
+| Offered load | Incoming operations / second | Demand, including rejects |
+| Goodput | Successful operations / second | Successful work |
+| Concurrency | Operations in progress | Resource occupancy |
+| Queue wait | Time waiting for capacity | Early overload signal |
+| Utilization | Busy capacity / total capacity | Saturation risk |
 
-## Throughput
+## Little's Law
 
-Throughput measures how much work a system can handle per unit time.
-Examples include:
-- Requests per second
-- Messages per second
-- Transactions per second
+For a stable system:
 
-A system may have low latency but poor throughput, or high throughput but unacceptable latency.
+`L = λ × W`
 
----
+L is average work in system; λ is throughput; W is average time in system. Example: 200 requests/s × 0.25s implies about 50 concurrent requests. Little's Law describes a stable average, not capacity or tail latency.
 
-## Vertical Scaling
+## Why latency collapses near saturation
 
-Vertical scaling increases the resources of a single machine.
+```mermaid
+flowchart TD
+  A[Arrival rate rises] --> B[Service capacity approaches full]
+  B --> C[Queue wait increases]
+  C --> D[Caller deadlines expire]
+  D --> E[Retries add arrivals]
+  E --> B
+```
 
-### Advantages
-- Simple to implement
-- No architectural changes
-- Immediate performance gains
+The system may remain busy doing work for callers that already abandoned it. Use timeouts, retry budgets, backoff/jitter, admission control and bulkheads.
 
-### Limitations
-- Hardware limits
-- Single point of failure
-- High cost at scale
+## Throughput vs latency
 
-Vertical scaling is a temporary optimization, not a long-term strategy.
+```mermaid
+xychart-beta
+  title "Illustrative throughput and tail-latency trend"
+  x-axis ["Low", "Moderate", "High", "Near saturation"]
+  y-axis "Relative level" 0 --> 100
+  line [10, 35, 70, 88]
+  line [8, 14, 42, 96]
+```
 
----
+Conceptual illustration only: one curve represents throughput and another tail latency. Real curves must come from measurement.
 
-## Horizontal Scaling
+## Scaling choices
 
-Horizontal scaling adds more machines to distribute load.
+| Tactic | Best when | Trade-off |
+|---|---|---|
+| Optimize code/query | Inefficient work | Profile first |
+| Vertical scale | One node resource bound | Ceiling and blast radius |
+| Horizontal scale | Work can be distributed | Coordination and state |
+| Cache | Repeated reads with acceptable freshness | Invalidation and memory |
+| Queue | Slow/non-interactive work | Eventual completion/backlog |
+| Partition/shard | Data/write throughput constrained | Rebalancing/cross-shard complexity |
+| CDN | Public/cacheable content | Invalidation/geography |
 
-### Benefits
-- Fault tolerance
-- Elastic scalability
-- Cost efficiency
+## Practical performance loop
 
-### Challenges
-- Distributed state
-- Network failures
-- Data consistency
+1. Define user-facing SLO and percentile.
+2. Trace across service boundaries.
+3. Load-test representative and peak/burst shapes.
+4. Find first saturated resource.
+5. Change one variable and rerun.
+6. Test failure/overload, not only steady throughput.
+7. Report hardware, topology, data size, concurrency and duration.
 
-Horizontal scaling introduces complexity but is essential for large systems.
+## References
+
+- [ByteByteGo — Scale from Zero to Millions of Users](https://bytebytego.com/courses/system-design-interview/scale-from-zero-to-millions-of-users)
+- [Google SRE — Service Level Objectives](https://sre.google/sre-book/service-level-objectives/)
+- [Little's Law](https://en.wikipedia.org/wiki/Little%27s_law)

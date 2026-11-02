@@ -1,133 +1,90 @@
 # Architecture Fundamentals — Visual Learning Path
 
-This section explains the building blocks used in nearly every HLD. Start with the system view, then follow the links into the deeper concept notes.
+This is the prerequisite map for HLD, LLD/OOD and GenAI system-design interviews. Start from the end-to-end request path, learn the pressure points, then practice explaining trade-offs.
 
-## How a request moves through a typical system
+## The big picture: how a request moves
 
 ```mermaid
-flowchart LR
+flowchart TB
   U[User / Client] --> DNS[DNS]
-  DNS --> CDN[CDN / Edge cache]
-  CDN --> LB[Load balancer]
+  DNS --> CDN[CDN / Edge]
+  CDN --> WAF[WAF / API edge]
+  WAF --> LB[Load balancer]
   LB --> API[Stateless API]
-  API --> C{Cache hit?}
-  C -->|Yes| R[Response]
-  C -->|No| DB[(Primary data store)]
-  DB --> C
-  API --> Q[(Queue / Stream)]
-  Q --> W[Background workers]
-  W --> S[(Search / Analytics / Object store)]
-  API -.-> O[Logs, metrics, traces]
-  W -.-> O
+  API --> CACHE{Cache hit?}
+  CACHE -->|Yes| RESP[Response]
+  CACHE -->|No| DB[(System of record)]
+  DB --> API
+  API -->|Async work| Q[(Queue / stream)]
+  Q --> W[Worker pool]
+  W --> DATA[(Search / analytics / object data)]
+  API -.-> OBS[Logs / metrics / traces]
+  W -.-> OBS
 ```
 
-**Read it this way:** the synchronous path should return the user-facing result; queues move non-interactive work out of that path. A cache is an optimization, not the source of truth. Telemetry spans every hop.
+**Read the flow:** edge services shape and secure requests; stateless compute runs business logic; caches accelerate reads; durable stores own state; queues separate slow work; observability spans the entire path.
 
-## Core concepts at a glance
+## Concept map
 
-| Concept | Main question | Deep dive |
+| Topic | Question | Practical page |
 |---|---|---|
-| Latency & throughput | How long does one request take, and how much work can we sustain? | [Latency, throughput and scaling](latency_throughput_scaling.md) |
-| Consistency | Which version of data may a reader observe? | [Consistency models](consistency_models.md) |
-| Caching | Which reads can be served without hitting the source of truth? | [Caching strategies](caching_strategies.md) |
-| Queues & streams | What work can happen asynchronously, and how is it recovered? | [Message queues and streams](message_queues_and_streams.md) |
-| Data stores | Which access patterns and invariants should shape storage choice? | [Database selection](database_selection.md) |
-| Scaling | What is the bottleneck, and when should we scale vertically or horizontally? | [Scalability basics](scalability_basics.md) |
+| System design overview | What am I designing and which trade-offs matter? | [Overview](system_design_overview.md) |
+| Interview approach | How do I structure a 45-minute interview? | [Approach](how_to_approach_system_design.md) |
+| Scalability | What should scale and what is the bottleneck? | [Scalability](scalability_basics.md) |
+| Latency / throughput | Where does time go and what rate can we sustain? | [Latency and throughput](latency_throughput_scaling.md) |
+| Proxies / load balancing | How are requests distributed and protected? | [Load balancers and proxies](load_balancers_and_proxies.md) |
+| Caching | Which reads can safely avoid the source of truth? | [Caching](caching_strategies.md) |
+| Consistency | Which version of data may a client observe? | [Consistency](consistency_models.md) |
+| CAP | What happens when coordination is unavailable? | [CAP](CAP_theorem.md) |
+| Databases | Which data model fits the access patterns and invariants? | [Database selection](database_selection.md) |
+| Queues / streams | Which work can be decoupled and replayed? | [Queues and streams](message_queues_and_streams.md) |
 
-## 1. Latency is a budget, not one number
-
-```mermaid
-flowchart LR
-  A[Client] -->|DNS + connect| B[Edge]
-  B -->|Network hop| C[Load balancer]
-  C -->|Network + queueing| D[Application]
-  D -->|Cache lookup| E{Hit?}
-  E -->|Yes| H[Response]
-  E -->|No| F[(Database)]
-  F -->|Query + disk / network| D
-  D --> H
-```
-
-The total response time is the sum of serial work plus the effect of parallel work, queueing and network waits. A slow dependency can dominate the whole request. Track percentiles such as p50, p95 and p99 rather than relying only on averages.
-
-## 2. Cache-aside read flow
-
-```mermaid
-sequenceDiagram
-  participant A as API
-  participant C as Cache
-  participant D as Database
-  A->>C: GET key
-  alt Cache hit
-    C-->>A: Value
-  else Cache miss
-    C-->>A: Miss
-    A->>D: SELECT by key
-    D-->>A: Source value
-    A->>C: SET key with TTL
-  end
-  A-->>A: Return value
-```
-
-Cache invalidation, TTL, stampede protection and stale-read tolerance are product decisions. See [Caching strategies](caching_strategies.md).
-
-## 3. Asynchronous work and backpressure
+## A practical request budget
 
 ```mermaid
 flowchart LR
-  P[Producer] -->|Publish| Q[(Durable queue)]
-  Q -->|Lease / deliver| C1[Worker pool]
-  C1 -->|Commit effect, then ACK| DB[(Worker data store)]
-  C1 -->|Retries exhausted| DLQ[(Dead-letter queue)]
-  Q -.-> M[Queue depth + oldest age]
-  C1 -.-> M
+  A[Client + network] --> B[Edge / TLS]
+  B --> C[Gateway + routing]
+  C --> D[Application]
+  D --> E[Cache]
+  E -->|miss| F[(Database)]
+  D --> G[External dependency]
+  D --> H[Response]
 ```
 
-The consumer must be idempotent because a crash between committing the effect and acknowledging the message can cause redelivery. See [Message queues and streams](message_queues_and_streams.md).
+For a serial request, time is spent across network waits, queueing and service. Fan-out requests often wait for the slowest branch. Track p50/p95/p99, timeouts, queue wait, saturation and business success.
 
-## 4. Storage is selected from access patterns
+## Interview progression
 
 ```mermaid
 flowchart TD
-  A[Describe invariants + access patterns] --> B{Transactions and joins central?}
-  B -->|Yes| SQL[Relational SQL store]
-  B -->|No| C{Key-value access / massive scale?}
-  C -->|Yes| KV[Key-value / wide-column store]
-  C -->|No| D{Relationships / graph traversal?}
-  D -->|Yes| G[Graph store]
-  D -->|No| E{Search or analytics workload?}
-  E -->|Search| S[Search index]
-  E -->|Analytics| OLAP[Columnar / analytical store]
-  E -->|Neither| OBJ[Object / document store as suitable]
+  A[Clarify product scope] --> B[Define NFRs + SLOs]
+  B --> C[Estimate workload]
+  C --> D[Draw simplest correct design]
+  D --> E[Identify first bottleneck]
+  E --> F[Scale only that bottleneck]
+  F --> G[Inject failures + discuss consistency]
+  G --> H[Cost, security, operations]
+  H --> I[Summarize decisions]
 ```
 
-This is a conversation starter, not an automatic database selector. Many systems use more than one store, each with a clear owner and source-of-truth rule.
+## Further learning tracks
 
-## Cloud building blocks (starter mapping)
+- [OOD interview guide](../object_oriented_design/README.md)
+- [Scale from zero to millions](../system_designs/scale-from-zero-to-millions/README.md)
+- [GenAI system design](../genai_system_design/README.md)
+- [System design catalog](../system_designs/README.md)
+- [Cloud architecture visual guide](../cloud_architecture/README.md)
+- [Breakscale workload testing](../system_designs/BREAKSCALE_TESTING.md)
 
-| Logical capability | AWS starting point | GCP starting point |
-|---|---|---|
-| DNS | Route 53 | Cloud DNS |
-| CDN / edge | CloudFront | Cloud CDN |
-| HTTP load balancing | Application Load Balancer | Cloud Load Balancing |
-| Compute / containers | ECS or EKS; EC2 for VMs | Cloud Run or GKE; Compute Engine for VMs |
-| Relational database | RDS / Aurora | Cloud SQL / AlloyDB |
-| Globally distributed relational database | — (Aurora Global Database has a different model) | Spanner |
-| NoSQL document / key-value | DynamoDB | Firestore / Bigtable (different data models) |
-| Cache | ElastiCache | Memorystore |
-| Object storage | S3 | Cloud Storage |
-| Queue / pub-sub | SQS / SNS | Pub/Sub |
-| Event streaming | Kinesis / MSK | Pub/Sub / Dataflow (different roles) |
-| Secrets | Secrets Manager / SSM Parameter Store | Secret Manager |
-| Metrics / logs / traces | CloudWatch / X-Ray | Cloud Monitoring / Logging / Trace |
+## Study routine
 
-See [cloud architecture](../cloud_architecture/README.md) for full diagrams and caveats.
+For each topic: reproduce the diagram without looking, explain one failure mode, implement a small TypeScript example where appropriate, then rehearse a five-minute answer and a deeper fifteen-minute discussion.
 
-## Study sequence
+## References
 
-1. Explain latency vs throughput and draw a request path.
-2. Explain cache hit/miss and invalidation.
-3. Explain replica lag and read-after-write.
-4. Explain queue acknowledgement, duplicate delivery and DLQ.
-5. Choose a data store from access patterns.
-6. Map the logical blocks to AWS and GCP without assuming service names imply identical semantics.
+- [ByteByteGo — Scale from Zero to Millions of Users](https://bytebytego.com/courses/system-design-interview/scale-from-zero-to-millions-of-users)
+- [ByteByteGo — Object-Oriented Design Interview](https://bytebytego.com/courses/object-oriented-design-interview/what-is-an-object-oriented-design-interview)
+- [ByteByteGo — GenAI System Design Interview](https://bytebytego.com/courses/genai-system-design-interview/introduction-and-overview)
+
+These are further-reading references. The diagrams, explanations and examples in this repository are original.
