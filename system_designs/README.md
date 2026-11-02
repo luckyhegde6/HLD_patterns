@@ -38,6 +38,11 @@ The following 17 designs have editable Archify architecture sources, visual expl
 
 ## Additional worked examples
 
+| [Event-Driven Order Platform](examples/event-driven-order-platform/README.md) | Order saga, inventory reservation, payment idempotency and outbox/inbox |
+| [Observability Platform](examples/observability-platform/README.md) | Metrics/logs/traces ingestion, cardinality, query federation and tenant quotas |
+| [Multi-Tenant SaaS Control Plane](examples/multi-tenant-saas-control-plane/README.md) | Tenant lifecycle, isolation, cells, metering and control/data-plane split |
+
+
 These are original focused case studies. They add architecture and sequence examples but are not yet part of the 17-design Archify export set.
 
 | Example | Focus |
