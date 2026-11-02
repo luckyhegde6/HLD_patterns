@@ -50,6 +50,10 @@ These are original focused case studies. They add architecture and sequence exam
 | [RAG Knowledge Assistant](examples/rag-knowledge-assistant/README.md) | ACL-aware retrieval, citations, evaluation and prompt-injection boundaries |
 | [Scale from Zero to Millions](scale-from-zero-to-millions/README.md) | Progressive architecture evolution |
 
+## GenAI product case studies
+
+Ten original GenAI HLD walkthroughs are available in the [GenAI case-study catalog](genai/README.md): Gmail Smart Compose, Google Translate, personal assistant chatbot, image captioning, RAG, realistic face generation, high-resolution image synthesis, text-to-image, personalized headshots and text-to-video. These are focused Markdown case studies, separate from the Archify export set.
+
 ## Suggested study order
 
 API Gateway → Rate Limiter → Cache → Circuit Breaker → Message Queue → Notification → Task Scheduler → Distributed ID → Payment → Ticket Booking → Chat → Feed → Search → Object Storage → LLM Gateway → RAG Assistant.
