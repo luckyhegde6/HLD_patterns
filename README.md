@@ -10,8 +10,8 @@ A visual, interview-focused High-Level Design (HLD) learning repository. The goa
 | Architecture fundamentals | [Fundamentals visual guide](fundamentals/README.md) · [Fundamentals](fundamentals/) | Visualize latency, consistency, caching, queues, data stores and scaling |
 | Distributed patterns | [Patterns visual guide](patterns/README.md) · [Patterns](patterns/) | Select sharding, consistent hashing, EDA, queues and sagas with clear trade-offs |
 | Cloud architecture | [Cloud visual guide](cloud_architecture/README.md) · [Cloud architecture](cloud_architecture/) | Map logical designs to AWS, GCP and multi-cloud deployments |
-| Worked systems | [System designs](system_designs/README.md) | Trace requirements, architecture, APIs, data, failure and scale |
-| AI Architect / FDE | [AI & FDE playbook](playbook/ai_architect_fde_playbook.md) | Discover a workflow, evaluate AI fit, integrate models/tools and ship safely |
+| Worked systems | [System designs](system_designs/README.md) · [Expanded catalog](system_designs/EXPANDED_CATALOG.md) | Trace requirements, architecture, APIs, data, failure and scale |
+| AI Architect / FDE | [AI & FDE playbook](playbook/ai_architect_fde_playbook.md) · [Five-layer AI runtime](genai_system_design/ai_runtime_layers/README.md) | Design prompt, context, harness, loop and graph boundaries |
 
 ## Repository map
 
@@ -70,3 +70,12 @@ GitHub renders Mermaid blocks in Markdown. SVGs in `docs/diagrams/` provide stab
 ## Learning principle
 
 **A strong HLD is a set of explicit, testable decisions—not a collection of boxes.** Every box needs an owner, every arrow a contract, every store a data model, every async flow a recovery strategy, and every scaling decision a workload-based reason.
+
+
+## Expanded system designs
+
+The modern platform catalog adds YouTube, WhatsApp, Twitter/X, Instagram, Uber/Rapido, food delivery, Netflix, Google Drive, Google Maps, search autocomplete and distributed logging. See [the expanded catalog](system_designs/EXPANDED_CATALOG.md).
+
+## Five-layer AI runtime
+
+**Prompt → Context → Harness → Loop → Graph**. See the [architecture guide](genai_system_design/ai_runtime_layers/README.md) and [visual explainer](genai_system_design/ai_runtime_layers/visual_explainer.md).
