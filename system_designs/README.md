@@ -78,3 +78,11 @@ API Gateway → Rate Limiter → Cache → Circuit Breaker → Message Queue →
 - Editable diagram source and references/credits.
 
 See [diagram standards](../docs/DIAGRAM_STANDARDS.md), [AI/agentic implementation guidelines](../docs/AI_AGENTIC_IMPLEMENTATION_GUIDELINES.md) and [cloud architecture guide](../cloud_architecture/README.md).
+
+## Expanded modern platform catalog
+
+See [EXPANDED_CATALOG.md](EXPANDED_CATALOG.md) for YouTube, WhatsApp, Twitter/X, Instagram, rideshare, food delivery, Netflix, Google Drive, Maps, autocomplete, notifications and distributed logging. The designs include requirements, architecture, data models, failure modes, trade-offs, interview walkthroughs, visual explainers and AI/FDE implementation notes.
+
+## Five-layer AI runtime
+
+See [AI Runtime Layers](../genai_system_design/ai_runtime_layers/README.md) for Prompt, Context, Harness, Loop and Graph responsibilities, sequence diagrams, MCP example and safety checklist.
