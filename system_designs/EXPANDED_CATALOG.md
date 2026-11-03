@@ -13,7 +13,7 @@
 | Google Maps | [google-maps](google-maps/README.md) | Tiles, routing, traffic, geospatial indexes |
 | Search autocomplete | [search-autocomplete](search-autocomplete/README.md) | Prefix index, top-K, ranking, latency |
 | Notification system | [existing design](notification-system/README.md) | Preferences, retries, provider quotas |
-| Distributed logging | [Logger Framework](logger-framework/README.md) | Ingestion, cardinality, hot/cold storage |
+| Distributed logging | [distributed logging](distributed-logging/README.md) | Ingestion, cardinality, hot/cold storage |
 
 ## Reuse existing foundations
 - [Chat / Messaging](examples/chat-messaging/README.md) supports WhatsApp.
